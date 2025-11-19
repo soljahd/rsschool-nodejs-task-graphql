@@ -2,9 +2,11 @@ import { GraphQLSchema, GraphQLObjectType } from 'graphql';
 import type { PrismaClient } from '@prisma/client';
 import { getQueries } from './resolver/queries.js';
 import { getMutations } from './resolver/mutations.js';
+import { createLoaders, type Loaders } from './loaders.js';
 
 export interface GQLContext {
   prisma: PrismaClient;
+  loaders: Loaders;
 }
 
 const RootQuery = new GraphQLObjectType({
@@ -18,11 +20,13 @@ const RootMutation = new GraphQLObjectType({
 });
 
 export const createSchema = (prisma: PrismaClient) => {
+  const loaders = createLoaders(prisma);
+
   return {
     schema: new GraphQLSchema({
       query: RootQuery,
       mutation: RootMutation,
     }),
-    contextValue: { prisma } as GQLContext,
+    contextValue: { prisma, loaders } as GQLContext,
   };
 };
