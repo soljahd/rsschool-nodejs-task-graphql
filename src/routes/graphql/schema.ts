@@ -1,5 +1,6 @@
-import { GraphQLSchema, GraphQLObjectType, GraphQLString } from 'graphql';
+import { GraphQLSchema, GraphQLObjectType } from 'graphql';
 import type { PrismaClient } from '@prisma/client';
+import { getQueries } from './resolver/queries.js';
 
 export interface GQLContext {
   prisma: PrismaClient;
@@ -7,12 +8,7 @@ export interface GQLContext {
 
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
-  fields: {
-    testString: {
-      type: GraphQLString,
-      resolve: () => 'Test string',
-    },
-  },
+  fields: getQueries,
 });
 
 export const createSchema = (prisma: PrismaClient) => {
