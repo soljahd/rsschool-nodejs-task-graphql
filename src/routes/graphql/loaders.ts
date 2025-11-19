@@ -13,6 +13,28 @@ export const createLoaders = (prisma: PrismaClient) => {
     },
   );
 
+  const postLoader = new DataLoader<string, Post | null>(
+    async (ids: readonly string[]) => {
+      const posts = await prisma.post.findMany({
+        where: { id: { in: [...ids] } },
+      });
+
+      const postMap = new Map(posts.map((post) => [post.id, post]));
+      return ids.map((id) => postMap.get(id) || null);
+    },
+  );
+
+  const profileLoader = new DataLoader<string, Profile | null>(
+    async (ids: readonly string[]) => {
+      const profiles = await prisma.profile.findMany({
+        where: { id: { in: [...ids] } },
+      });
+
+      const profileMap = new Map(profiles.map((profile) => [profile.id, profile]));
+      return ids.map((id) => profileMap.get(id) || null);
+    },
+  );
+
   const memberTypeLoader = new DataLoader<string, MemberType | null>(
     async (ids: readonly string[]) => {
       const memberTypes = await prisma.memberType.findMany({
@@ -101,6 +123,8 @@ export const createLoaders = (prisma: PrismaClient) => {
 
   return {
     user: userLoader,
+    post: postLoader,
+    profile: profileLoader,
     memberType: memberTypeLoader,
     postsByAuthor: postsByAuthorLoader,
     profileByUserId: profileByUserIdLoader,
